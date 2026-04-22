@@ -1,17 +1,17 @@
 import sqlite3
 
 def create_database():
-    conn = sqlite3.connect('fridge.db')
-    cursor = conn.cursor()
+    _conn = sqlite3.connect('fridge.db')      
+    _cursor = _conn.cursor()                 
 
-    cursor.execute('''
+    _cursor.execute('''
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL
     )
     ''')
 
-    cursor.execute('''
+    _cursor.execute('''
     CREATE TABLE IF NOT EXISTS recipes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -19,7 +19,7 @@ def create_database():
     )
     ''')
 
-    cursor.execute('''
+    _cursor.execute('''
     CREATE TABLE IF NOT EXISTS recipe_products (
         recipe_id INTEGER NOT NULL,
         product_id INTEGER NOT NULL,
@@ -37,11 +37,11 @@ def create_database():
         'рис', 'гречка', 'курица', 'чеснок'
     ]
     for p in products:
-        cursor.execute('INSERT OR IGNORE INTO products (name) VALUES (?)', (p,))
+        _cursor.execute('INSERT OR IGNORE INTO products (name) VALUES (?)', (p,))
 
     recipes = [
         ('Омлет', 'Взбить яйца с молоком и солью. Пожарить на сковороде 5 минут.'),
-        ('Бутерброд с сыром', 'Положить сыр на хлеб. Разогреть в микроволновке 30 секунд.'),
+        ('Бутерброд с сыром', 'Положить сыр на хлеб. Разогреть в микроволновке  за 30 секунд.'),
         ('Гречка с маслом', 'Сварить гречку. Добавить сливочное масло.'),
         ('Яичница', 'Разбить яйца на сковороду. Жарить до готовности. Посолить.'),
         ('Салат из огурцов и помидоров', 'Нарезать огурцы и помидоры. Посолить. Заправить маслом.'),
@@ -50,13 +50,13 @@ def create_database():
         ('Сладкий бутерброд', 'Намазать хлеб маслом, посыпать сахаром.')
     ]
     for name, instr in recipes:
-        cursor.execute('INSERT OR IGNORE INTO recipes (name, instructions) VALUES (?, ?)', (name, instr))
+        _cursor.execute('INSERT OR IGNORE INTO recipes (name, instructions) VALUES (?, ?)', (name, instr))
 
-    cursor.execute('SELECT id, name FROM products')
-    product_ids = {name: id for id, name in cursor.fetchall()}
+    _cursor.execute('SELECT id, name FROM products')
+    product_ids = {name: id for id, name in _cursor.fetchall()}
 
-    cursor.execute('SELECT id, name FROM recipes')
-    recipe_ids = {name: id for id, name in cursor.fetchall()}
+    _cursor.execute('SELECT id, name FROM recipes')
+    recipe_ids = {name: id for id, name in _cursor.fetchall()}
 
     links = [
         (recipe_ids['Омлет'], product_ids['яйца'], '2 шт'),
@@ -83,11 +83,11 @@ def create_database():
         (recipe_ids['Сладкий бутерброд'], product_ids['сахар'], '1 ч.л'),
     ]
     for recipe_id, product_id, amount in links:
-        cursor.execute('INSERT OR IGNORE INTO recipe_products (recipe_id, product_id, amount) VALUES (?, ?, ?)',
+        _cursor.execute('INSERT OR IGNORE INTO recipe_products (recipe_id, product_id, amount) VALUES (?, ?, ?)',
                        (recipe_id, product_id, amount))
 
-    conn.commit()
-    conn.close()
+    _conn.commit()
+    _conn.close()
     print("Database 'fridge.db' created and filled.")
 
 if __name__ == '__main__':
