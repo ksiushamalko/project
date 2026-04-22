@@ -31,8 +31,10 @@ def search_recipes():
     
     text_result.insert(END, "Рецептов не найдено.\n\n")
     
-    db.cursor.execute('SELECT id, name, instructions FROM recipes')
-    all_recipes = db.cursor.fetchall()
+    cursor = db._cursor
+    
+    cursor.execute('SELECT id, name, instructions FROM recipes')
+    all_recipes = cursor.fetchall()
     
     best_recipe = None
     best_match_count = 0
@@ -41,13 +43,13 @@ def search_recipes():
     for recipe in all_recipes:
         recipe_id = recipe['id']
         
-        db.cursor.execute('''
+        cursor.execute('''
             SELECT p.name 
             FROM recipe_products rp
             JOIN products p ON rp.product_id = p.id
             WHERE rp.recipe_id = ?
         ''', (recipe_id,))
-        required = [row['name'].lower() for row in db.cursor.fetchall()]
+        required = [row['name'].lower() for row in cursor.fetchall()]
         required_products = set(required)
         
         have_products = user_products_lower & required_products
@@ -59,7 +61,7 @@ def search_recipes():
             best_missing = list(required_products - user_products_lower)
     
     if best_recipe and best_match_count > 0:
-        text_result.insert(END, f"Ближайший рецепт: {best_recipe['name']}\n")
+        text_result.insert(END, f"Возможный  рецепт: {best_recipe['name']}\n")
         text_result.insert(END, f"  {best_recipe['instructions']}\n\n")
         text_result.insert(END, f"У вас есть: {best_match_count} из {best_match_count + len(best_missing)} продуктов\n")
         
@@ -91,7 +93,7 @@ label_title = Label(
 label_instruction = Label(
     root,
     text="Введите продукты через запятую (например: яйца, молоко, соль)",
-    font=("Arial", 10)
+    font=("Arial", 12)
 )
 
 entry = Entry(
@@ -127,18 +129,17 @@ text_result = Text(
 label_result = Label(
     root,
     text="",
-    font=("Arial", 12),
-    fg="#4682B4",
+    font=("Arial", 12, "bold"),
+    fg="#4682B4", 
     bg = "#ADD8E6"
 )
 
 label_title.place(x=160, y=10, width=400, height=30)
-label_instruction.place(x=150, y=50, width=400, height=20)
+label_instruction.place(x=130, y=50, width=475, height=20)
 entry.place(x=150, y=80, width=400, height=30)
 button_search.place(x=200, y=120, width=150, height=35)
 button_clear.place(x=370, y=120, width=120, height=35)
 text_result.place(x=50, y=170, width=600, height=300)
-
 label_result.place(x=50, y=480, width=600, height=40)
 
 root.mainloop()
