@@ -90,5 +90,3 @@ def create_database():
     _conn.close()
     print("Database 'fridge.db' created and filled.")
 
-if __name__ == '__main__':
-    create_database()
